@@ -35,7 +35,7 @@ use anyhow::Result;
 use clap::Parser;
 use hound::WavReader;
 
-use ct2rs::Whisper;
+use ct2rs::{ Config, Device, Whisper};
 
 #[cfg(not(feature = "whisper"))]
 compile_error!("This example requires 'whisper' feature.");
@@ -53,14 +53,26 @@ struct Args {
 fn main() -> Result<()> {
     let args = Args::parse();
 
-    let whisper = Whisper::new(args.model_dir, Default::default())?;
+    let cfg = Config{
+        device: Device::CUDA,
+        ..Config::default()
+    };
+    
+
+    let whisper = Whisper::new(args.model_dir, cfg)?;
 
     let samples = read_audio(args.audio_file, whisper.sampling_rate())?;
 
-    let res = whisper.generate(&samples, None, false, &Default::default())?;
-    for r in res {
-        println!("{}", r);
+    let segments: Vec<(f32, f32)> = vec![(0.76, 4.7), (5.94, 13.44), (14.46, 21.22), (21.5, 35.0)];
+    for seg in segments.iter() {
+        let start_idx = (seg.0 * 16000.0) as usize;
+        let end_idx = (seg.1 * 16000.0) as usize;
+        let res = whisper.generate(&samples[start_idx..end_idx], Some("zh"), true, &Default::default())?;
+        for r in res {
+            println!("{}", r);
+        }
     }
+
 
     Ok(())
 }
@@ -84,7 +96,9 @@ fn read_audio<T: AsRef<Path>>(path: T, sample_rate: usize) -> Result<Vec<f32>> {
         .collect::<Vec<f32>>();
 
     if spec.channels == 1 {
-        return Ok(resample(samples, spec.sample_rate as usize, sample_rate));
+        println!("mono wav:");
+        return Ok(samples)
+        //return Ok(resample(samples, spec.sample_rate as usize, sample_rate));
     }
 
     let mut mono = vec![];
@@ -94,5 +108,6 @@ fn read_audio<T: AsRef<Path>>(path: T, sample_rate: usize) -> Result<Vec<f32>> {
         }
     }
 
-    Ok(resample(mono, spec.sample_rate as usize, sample_rate))
+    //Ok(resample(mono, spec.sample_rate as usize, sample_rate))
+    Ok(mono)
 }

@@ -41,11 +41,11 @@ rustfft = { version = "6.2.0", optional = true }
 serde = { version = "1.0.204", features = ["derive"], optional = true }
 serde_json = { version = "1.0.120", optional = true }
 
-[target.'cfg(windows)'.dependencies]
-intel-mkl-src = { version = "0.8.1", optional = true, features = ["mkl-static-ilp64-seq"] }
+#[target.'cfg(windows)'.dependencies]
+#intel-mkl-src = { version = "0.8.1", optional = true, features = ["mkl-static-ilp64-seq"] }
 
-[target.'cfg(unix)'.dependencies]
-intel-mkl-src = { version = "0.8.1", optional = true }
+#[target.'cfg(unix)'.dependencies]
+#intel-mkl-src = { version = "0.8.1", optional = true }
 
 [dev-dependencies]
 clap = { version = "4.5.9", features = ["derive"] }
@@ -60,11 +60,11 @@ cxx-build = "1.0.124"
 walkdir = "2.5.0"
 
 [features]
-default = ["ruy", "accelerate"]
+default = ["ruy", "accelerate", "cuda", "cudnn", "whisper"]
 whisper = ["dep:ndarray", "dep:rustfft", "dep:serde", "dep:serde_json"]
 
 # Features to select backends.
-mkl = ["dep:intel-mkl-src"]
+#mkl = ["dep:intel-mkl-src"]
 openblas = []
 ruy = []
 accelerate = []
