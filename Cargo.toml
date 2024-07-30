@@ -40,6 +40,7 @@ intel-mkl-src = { version = "0.8.1", optional = true }
 [dev-dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
 rand = "0.8.5"
+rsnltk = "0.1.3"
 
 
 [build-dependencies]
@@ -66,3 +67,6 @@ name = "marian-mt"
 
 [[example]]
 name = "generator"
+
+[[example]]
+name = "marian-test"
